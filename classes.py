@@ -22,6 +22,7 @@ class Game():
             for entry in options: 
                 print(entry, ":", menu[entry])
 
+
             selection = input("Please Select:") 
             if selection == '1':
                 pass 
@@ -40,7 +41,7 @@ class Game():
                 #print "Unknown Option Selected!" 
 
         """
-        print("***** Scrable *****")
+        print("***** Scrabble *****")
         print("-------------------")
         print("1: Σκορ\n2: Ρυθμίσεις\n3: Παιχνίδι\nq: Έξοδος")
         print("-------------------")
