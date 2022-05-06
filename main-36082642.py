@@ -1,16 +1,17 @@
 import classes
 
 letters = {
-    "Α":"1",
-    "Β":"3",
-    "Γ":"12",
-    "Δ":"5"
+    # a dict like this: 
+    # letter: [cost, frequency]
+
+    "Α":[1, 13],
+    "Β":[3, 9],
+    "Γ":[12, 11],
+    "Δ":[5, 14]
 }
 
-
-game = classes.Game()
-game.run()
 sak = classes.SakClass(letters)
-
+game = classes.Game(sak)
+game.setup()
 
 
