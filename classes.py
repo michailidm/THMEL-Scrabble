@@ -1,19 +1,33 @@
-class Game():
-    
+import random
+
+
+def showScore():
+    pass
+
+
+def showSettings():
+    pass
+
+
+class Game:
+
+    # sak is of type SakClass
     def __init__(self, sak):
-        self.sak = SakClass(sak)
-        pass
+        self.sak = sak
 
     def __repr__(self):
         pass
 
     def setup(self):
-        print("***** Scrable *****")
+        print("***** Scrabble *****")
         while True:
-            print("-------------------")
-            print("1: Σκορ\n2: Ρυθμίσεις\n3: Παιχνίδι\nq: Έξοδος")
-            print("-------------------")
-            ans = input("Επίλεξε από το μενού: ")
+            print('-------------------')
+            print('1: Σκορ')
+            print('2: Ρυθμίσεις')
+            print('3: Παιχνίδι')
+            print('q: Έξοδος')
+            print('-------------------')
+            ans = input('Επίλεξε από το μενού: ')
 
             if ans == '1':
                 print('Σκορ')
@@ -29,19 +43,20 @@ class Game():
                 break
 
             print('Επίλεξε ξανά: ')
-        pass
 
-        if ans == 1:
-            pass
-        elif ans == 2:
-            pass
-        elif ans == 3:
-            # start Scrabble
+
+        if ans == '1':
+            # show score
+            showScore()
+        elif ans == '2':
+            # show settings
+            showSettings()
+        elif ans == '3':
+            # start Scrabble game
             self.run()
-            pass
         elif ans == 'q':
             # exit
-            pass
+            exit()
 
     def run(self):
         """
@@ -52,65 +67,79 @@ class Game():
         menu['q'] = "Έξοδος"
 
 
-        while True: 
+        while True:
             options = menu.keys()
-            for entry in options: 
+            for entry in options:
                 print(entry, ":", menu[entry])
 
-            selection = input("Please Select:") 
+            selection = input("Please Select:")
             if selection == '1':
-                pass 
+                pass
                 #print "add"
             elif selection == '2':
-                pass 
+                pass
                 #print "delete"
             elif selection == '3':
                 pass
-                #print "find" 
+                #print "find"
             elif selection == 'q':
-                pass 
+                pass
                 #break
             else:
-                pass 
-                #print "Unknown Option Selected!" 
+                pass
+                #print "Unknown Option Selected!"
 
         """
 
+        print("Running Scrabble")
         self.sak.randomize_sak()
-
         available_letters = self.sak.getletters(7)
-
-        print('Διαθέσιμα γράμματα: ' + available_letters)        
+        # print(self.sak.getletters(2))
+        print('Διαθέσιμα γράμματα: ')
+        print(available_letters)
 
     def end(self):
         pass
 
 
 class SakClass():
-    def __init__(self, sak):
-        self.sak = sak
-        
-        
+    def __init__(self, letters_weight, letters_amount):
+        self.letters_weight = letters_weight
+        self.letters_amount = letters_amount
+
     def randomize_sak(self):
-        print('The sak was randomized.')
+        letter_list = []
+        for letter in self.letters_amount:
+            pair = [letter, self.letters_amount[letter]]
+            letter_list.append(pair)
+
+        # shuffle the letters_amount dict
+        random.shuffle(letter_list)
+
+        self.letters_amount = {}
+        for pair in letter_list:
+            self.letters_amount[pair[0]] = pair[1]
+
+
 
     def getletters(self, N):
         '''Returns N letters by removing them from the sak.'''
         letters_to_return = []
         for i in range(N):
-            letters_to_return.append(pop_letter(self.sak))
+            letters_to_return.append(pop_letter(self.letters_amount))
+            self.randomize_sak()
 
         return letters_to_return
 
     def putbackletters(self):
         pass
 
-def pop_letter(self, sak):
-    # where sak is a dictionary
-    letter = sak.keys()[0]  # takes a letter
-    sak[sak.keys()[0]][1] -= 1  # and reduces its frequency
+def pop_letter(letters_amount):
+    # where letters_amount is a dictionary
+    letter = list(letters_amount.keys())[0]  # takes a letter # we put list() so that we can have access
+    letters_amount[list(letters_amount.keys())[0]] -= 1  # and reduces its frequency
     # TODO: when freq=0
-
+    print(letters_amount[list(letters_amount.keys())[0]])
     return letter
 
 class Player():
