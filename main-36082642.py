@@ -60,7 +60,11 @@ letters_amount = {
 }
 
 sak = classes.SakClass(letters_weight, letters_amount)
-game = classes.Game(sak)
+
+human = classes.Human()
+computer = classes.Computer()
+game = classes.Game(sak, human, computer)
+
 # print(game.sak)
 game.setup()
 #game.run()
