@@ -1,8 +1,7 @@
 import classes
 
-letters_weight = {
-    # a dict like this: 
-    # letter: weight
+letters_weight = { 
+    # letter: weight (the score the letter gives)
 
     "Α": 1,
     "Β": 8,
@@ -31,7 +30,7 @@ letters_weight = {
 }
 
 letters_amount = {
-    # letter: amount-number of letters remaining
+    # letter: amount (number of letters remaining)
 
     "Α": 12,
     "Β": 1,
@@ -60,11 +59,11 @@ letters_amount = {
 }
 
 sak = classes.SakClass(letters_weight, letters_amount)
+# print("letters_amount = ", letters_amount)
 
 human = classes.Human()
 computer = classes.Computer()
 game = classes.Game(sak, human, computer)
 
-# print(game.sak)
 game.setup()
-#game.run()
+
