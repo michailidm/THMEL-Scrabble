@@ -1,36 +1,40 @@
 import itertools
 import random
-from re import S
 from tokenize import String
 
-from numpy import iterable
-
-
-# TODO:
+# -------------------------------------------------------------------------
+# - DONE
 # - πόσα γράμματα στο σακουλάκι(ΟΚ)
-
-# - Jupyter
-
 # - το σακουλάκι να αρχικοποιείται με την αρχή ενός νέου παιχνιδιού (μάλλον ΟΚ)
-
-# - όνομα για τον παίκτη-άνθρωπο
-
+# - στην αρχή για κάποιο λόγο βγάζει 28 γραμματα αντί για 14 (OK)
+# - αφαιρεί 3 γράμματα ανά γράμμα (1 + 2 παραπάνω) που παίχτηκε, όταν πατάμε 'p' αφαιρεί 7 γράμματα (OK)
 # - περιορισμός στο amount των letters (πρέπει amount >= 0 για κάθε γράμμα),
 #   γιατί όταν τελειώνουν τα γράμματα το παιχνίδι συνεχίζει με
 #   αρνητικό αριθμό γραμμάτων! (περίπου ΟΚ, γίνεται κάτι προς το τέλος)
-
-# - στην αρχή για κάποιο λόγο βγάζει 28 γραμματα αντί για 14 (OK)
-
-# - αφαιρεί 3 γράμματα ανά γράμμα (1 + 2 παραπάνω) που παίχτηκε, όταν πατάμε 'p' αφαιρεί 7 γράμματα
-
+# - 
+# ---------------------------------------------------------------------------
+# TODO:
+# - μεταφορά στο Jupyter
+# - dict for storing words from the file ('dict or list')
+# - dictionary lets = {'A':[12, 1], 'B':[2, 5], etc.}
+# - όνομα για τον παίκτη-άνθρωπο (προαιρετικά)
 # - την τελευταία φορά, που ο άνθρωπος έχει 6 γράμματα, τον αφίνει 
 #   να παίξει (μετά βέβαια σταματάει κανονικά) 
+# - όταν τελειώνουν τα γράμματα, βγάζει error (for let in SakClass.getletters(len(used_letters)):
+#   TypeError: 'NoneType' object is not iterable) 
+# - smart-teach (δεν βρήκε την 2η καλύτερη λέξη), γενικά να την δουλέψουμε
+# - 
 
-
+# =====================================================================================
+#                   ΥΠΟΘΕΣΕΙΣ
+#
 # Θεωρούμε ότι όταν ο παίκτης παίζει λέξη από τα 
 # διαθέσιμα γράμματα αλλά είναι μη αποδεκτή τότε 
 # χάνει την σειρά του χωρίς να ανανεωθούν τα γράμματά του
 # (δεν του αφαιρούνται τα γράμματα που έπαιξε με την λέξη αυτή)
+#
+# =====================================================================================
+
 
 FILE_GREEK = 'greek7.txt'
 
@@ -101,6 +105,8 @@ class SakClass:
         # self.letters_weight = letters_weight
         # self.letters_amount = letters_amount
 
+        #letters
+
         # Here we create an attrbute that is a copy of letters_amount dictionary,
         # so that we can store all the letters in letters_amount and 
         # change only the copy. In this way, we can "refill" the sak 
@@ -141,7 +147,7 @@ class SakClass:
 
         letters_to_return = []
         for i in range(N):
-            print('DEBUG: getletters: i = ', i)
+            # print('DEBUG: getletters: i = ', i)
             # αν δεν υπάρχει άλλο γράμμα στο σακουλάκι
 
             let = SakClass.pop_letter(temp_letter_dict)
@@ -183,13 +189,13 @@ class SakClass:
         i = 0
         while letters_amount_copy.get(list(letters_amount_copy.keys())[i]) <= 0 and i < len(letters_amount_copy) - 1:
             # print(len(letters_amount_copy))
-            print('Debug: pop_letter: i = ', i)
+            # print('Debug: pop_letter: i = ', i)
             i += 1
 
         if letters_amount_copy.get(list(letters_amount_copy.keys())[i]) > 0 and i < len(letters_amount_copy):
             # found a letter
             letter = list(letters_amount_copy.keys())[i]  # takes a letter # we put list() so that we can have access
-            print('Debug: pop_letter: letter = ', letter)
+            # print('Debug: pop_letter: letter = ', letter)
             letters_amount_copy[list(letters_amount_copy.keys())[i]] -= 1  # and reduces its frequency-amount
             # print('Debug: pop_letter: letters_amount_copy[list(letters_amount_copy.keys())[i]] = ',
                                     #   letters_amount_copy[list(letters_amount_copy.keys())[i]])
@@ -297,6 +303,11 @@ class Game:
                 print(f'Διαθέσιμα γράμματα: {avail_let_string}')
                 word = input('ΛΕΞΗ: ')
 
+                # smart-teach
+                if self.computer_algorithm == 4:
+                    self.pc.take_human_word(word)
+                    self.pc.take_human_letters(self.ph.letters)
+
                 # if the player wants to stop the game
                 if word == 'q':
                     print('==============================================')
@@ -311,13 +322,14 @@ class Game:
                         # όταν ο χρήστης δώσει 'p', τότε του κληρώνονται νέα γράμματα (εφόσον υπάρχουν),
                         # μετά επιστρέφονται τα προηγούμενα γράμματά του στο «σακουλάκι»
                         
-                        if SakClass.getletters(7) is None:
+                        human_letters = SakClass.getletters(7)
+                        if human_letters is None:
                             # if there are not 7 letters in the sak
                             # then end the game
                             self.end()
                         else:
                             letters_to_put_back = self.ph.letters
-                            self.ph.letters = SakClass.getletters(7)
+                            self.ph.letters = human_letters
                             self.sak.putbackletters(letters_to_put_back)
 
                         # και χάνει την σειρά του
@@ -367,17 +379,18 @@ class Game:
                                 self.ph.letters.remove(let)
                             
                             
+                            human_letters = SakClass.getletters(len(used_letters))
                             # if the sak does not have the number of letters we need
                             # then end the game
-                            if (SakClass.getletters(len(used_letters))) is None:
+                            if human_letters is None:
                                 self.end()
                             else:
                                 # else
                                 # και συμπληρώνουμε με νέα γράμματα από το σακουλάκι
                                 # (τόσα όσα βγάλαμε)
-                                if (SakClass.getletters(len(used_letters)) is not None):                                
-                                    for let in SakClass.getletters(len(used_letters)):
-                                        self.ph.letters.append(let)
+                                # if (SakClass.getletters(len(used_letters)) is not None):                                
+                                for let in human_letters:
+                                    self.ph.letters.append(let)
                         
                             self.current_player = self.pc
                             #self.switch_turn()
@@ -392,11 +405,12 @@ class Game:
                     # if word == 'p'
                     # if the sak does not have the number of letters we need
                     # then it's the turn of computer
-                    if SakClass.getletters(7) is None:
+                    human_letters = SakClass.getletters(7)
+                    if human_letters is None:
                         pass
                     else:            
                         letters_to_put_back = self.ph.letters
-                        self.ph.letters = SakClass.getletters(7)
+                        self.ph.letters = human_letters
                         self.sak.putbackletters(letters_to_put_back)
 
                     # it's the turn of computer
@@ -411,7 +425,6 @@ class Game:
 
                 self.current_player = self.ph
                 continue
-
 
     def end(self):
         '''Ends the game, prints the winner and the final score.'''
@@ -446,18 +459,19 @@ class Game:
             if ans == '1':               
                 print('MIN')
                 self.computer_algorithm = 1
-                break
+                self.setup()
             elif ans == '2':
                 print('MAX')
                 self.computer_algorithm = 2
-                break
+                self.setup()
             elif ans == '3':
                 print('SMART')
                 self.computer_algorithm = 3
-                break
+                self.setup()
             elif ans == '4':
                 print('SMART-TEACH')
                 self.computer_algorithm = 4
+                self.setup()
             elif ans == 'q':
                 # exit from settings
                 print('Εξοδος από Ρυθμίσεις')
@@ -490,6 +504,8 @@ class Game:
             count += int(SakClass.letters_amount_copy.get(let))
         return count
 
+    def get_ph(self):
+        return self.ph
 class Player():
     def __init__(self):   #, sak: SakClass, game: Game):
         self.score = 0
@@ -509,18 +525,20 @@ class Human(Player):
         pass
 
     def play(self):
-        print('Human is playing')
+        print('Παίζεις:')
 
 
 class Computer(Player):
-    def __init__(self):    #, sak: SakClass, game: Game):
+    def __init__(self):
         super().__init__()
+        self.human_word = ""
+        self.human_letters = ""
 
     def __repr__(self):
         pass
     
     def play(self, algorithm_number: int):
-        print('Computer is playing')
+        print('Παίζει ο Η/Υ:')
         
         if create_available_letters_string(self.letters, SakClass.letters_weight) is None:
             self.end()
@@ -576,41 +594,279 @@ class Computer(Player):
                     
                     # if the sak does not have the number of letters we need
                     # then end the game
-                    if (SakClass.getletters(len(used_letters))) is None:
-                        self.end()
+
+                    computer_letters = SakClass.getletters(len(used_letters))
+                    if computer_letters is None:
+                        return 1    # end-the-game code 
                     else:
-                        # else
-                        # και συμπληρώνουμε με νέα γράμματα από το σακουλάκι
-                        # (τόσα όσα βγάλαμε)
-                        if SakClass.getletters(len(used_letters)) is not None:                                
-                            for let in SakClass.getletters(len(used_letters)):
-                                self.letters.append(let)
+                        # και συμπληρώνουμε με νέα γράμματα από το σακουλάκι (τόσα όσα βγάλαμε)
+                        # if SakClass.getletters(len(used_letters)) is not None:                                
+                        for let in computer_letters:
+                            self.letters.append(let)
 
                     return
 
         # could not find a valid word
-        # pass
+        # play pass
 
         # if the sak does not have the number of letters we need
-        # then the computer loses its turn
-        if SakClass.getletters(7) is None:
+        # then the computer looses its turn
+        lets = SakClass.getletters(7)
+        if lets is None:
             pass
         else:            
             letters_to_put_back = self.letters
-            self.letters = SakClass.getletters(7)
+            self.letters = lets
             SakClass.putbackletters(letters_to_put_back)
         
         return
 
     def max(self):
-        pass
+        print('Παρακαλώ περίμενε λίγο.')
+        for i in range(7, 1, -1):
+            for perm in itertools.permutations(self.letters, i):
+                word = ''
+                for let in perm:
+                    # print('DEBUG: let = ', let)
+                    word = word + let
+                print('DEBUG: MAX: word = ', word)
+
+                if word_in_file(word, FILE_GREEK):
+                    print('DEBUG: Accepted ', word)
+
+                    # αποθήκευση των γραμμάτων που χρησιμοποιήθηκαν
+                    used_letters = []
+                    for let in word:
+                        used_letters.append(let)
+
+                    # play the word
+                    word_score = compute_word_score(word)
+                    self.score += word_score
+                    print(f'Λέξη Η/Υ: {word} - Βαθμοί: {word_score} - Σκορ: {self.score}')
+
+                    print('DEBUG: ', self.letters)
+                    for let in used_letters:
+                        self.letters.remove(let)
+                    
+                    
+                    # if the sak does not have the number of letters we need
+                    # then end the game
+                    lets = SakClass.getletters(len(used_letters))
+                    if lets is None:
+                        return 1    # end-the-game code 
+                    else:
+                        # και συμπληρώνουμε με νέα γράμματα από το σακουλάκι (τόσα όσα βγάλαμε)
+                        # if SakClass.getletters(len(used_letters)) is not None:                                
+                        for let in lets:
+                            self.letters.append(let)
+
+                    return
+
+        # could not find a valid word
+        # play pass
+
+        # if the sak does not have the number of letters we need
+        # then the computer loses its turn
+
+        lets = SakClass.getletters(7)
+        if lets is None:
+            pass
+        else:            
+            letters_to_put_back = self.letters
+            self.letters = lets
+            SakClass.putbackletters(letters_to_put_back)
+        
+        return
 
     def smart(self):
-        pass
+        print('Παρακαλώ περίμενε λίγο.')
+        accepted_words = {}
+        for i in range(2, 8):
+            for perm in itertools.permutations(self.letters, i):
+                word = ''
+                for let in perm:
+                    # print('DEBUG: let = ', let)
+                    word = word + let
+                # print('DEBUG: SMART: word = ', word)
+
+                if word_in_file(word, FILE_GREEK):
+                    print('DEBUG: Accepted ', word)
+                    word_score = compute_word_score(word)
+
+                    # αποθήκευσε τη λέξη με το σκορ της στο λεξικό
+                    accepted_words.update({word: word_score})
+
+                    
+        if len(accepted_words) != 0: 
+            # dict is not empty
+            # find the word with the maximum score
+            max_score = 0
+            for w in accepted_words.keys():
+                temp_score = compute_word_score(w)
+                
+                if temp_score > max_score:
+                    max_score = temp_score
+                    word_with_max_score = w
+
+                print(f'DEBUG: w, max_score = {w}, {max_score}')
+
+            # play the word
+            print(f'DEBUG: accepted_words = {accepted_words}')
+            self.score += max_score
+            print(f'Λέξη Η/Υ: {word_with_max_score} - Βαθμοί: {max_score} - Σκορ: {self.score}')
+
+            # αποθήκευση των γραμμάτων που χρησιμοποιήθηκαν
+            used_letters = []
+            for let in word_with_max_score:
+                used_letters.append(let)
+
+            print('DEBUG: ', self.letters)
+            for let in used_letters:
+                self.letters.remove(let)
+            
+            # if the sak does not have the number of letters we need
+            # then end the game
+            lets = SakClass.getletters(len(used_letters))
+            if lets is None:
+                return 1    # end-the-game code 
+            else:
+                # και συμπληρώνουμε με νέα γράμματα από το σακουλάκι (τόσα όσα βγάλαμε)
+                # if SakClass.getletters(len(used_letters)) is not None:                                
+                for let in lets:
+                    self.letters.append(let)
+        else:
+            # dict is empty, i.e. could not find a valid word
+            # play pass
+            print('Could not find the word.')
+
+            # if the sak does not have the number of letters we need
+            # then the game ends 
+            lets = SakClass.getletters(7)
+            if lets is None:
+                return 1   # return exit code 1 = end-of-game
+            else:            
+                letters_to_put_back = self.letters
+                self.letters = lets
+                SakClass.putbackletters(letters_to_put_back)
+            
+        return
 
     def smart_teach(self):
-        pass
+        # human plays
+        two_best_words = self.find_two_best_words()
+        if self.human_word == two_best_words[0]:
+            print('Συγχαρητήρια! Έπαιξες την καλύτερη δυνατή λέξη!')
+        elif self.human_word == two_best_words[1]:
+            print('Συγχαρητήρια! Έπαιξες την 2η καλύτερη δυνατή λέξη!')
+        else:
+            print('Η λέξη που έπαιξες δεν είναι η καλύτερη δυνατή.')
+            print('Θα μπορούσες να παίξεις τις εξής:')
+            print(f'1η καλύτερη: {two_best_words[0]}')
+            print(f'2η καλύτερη: {two_best_words[1]}')
 
+        print(f'Στο σακουλάκι: {Game.get_number_of_letters_in_sak()} γράμματα')
+    
+        # computer plays
+        self.smart()
+
+
+    def take_human_word(self, word: String):
+        self.human_word = word        
+
+    def take_human_letters(self, letters: list):
+        self.human_letters = letters
+
+    def find_two_best_words(self) -> list:
+        print('Παρακαλώ περίμενε λίγο.')
+        accepted_words = {}
+        for i in range(2, 8):
+            for perm in itertools.permutations(self.human_letters, i):
+                word = ''
+                for let in perm:
+                    # print('DEBUG: let = ', let)
+                    word = word + let
+                # print('DEBUG: find_two_best_words: word = ', word)
+
+                if word_in_file(word, FILE_GREEK):
+                    print('DEBUG: Accepted ', word)
+                    word_score = compute_word_score(word)
+
+                    # αποθήκευσε τη λέξη με το σκορ της στο λεξικό
+                    accepted_words.update({word: word_score})
+
+                    
+        if len(accepted_words) != 0: 
+            # dict is not empty
+            # find the word with the maximum score
+            max_score1 = 0
+            max_score2 = 0
+            word_with_max_score1 = ""
+            word_with_max_score2 = ""
+            for w in accepted_words.keys():
+                temp_score = compute_word_score(w)
+                
+                if temp_score > max_score1:
+                    max_score2 = max_score1
+                    max_score1 = temp_score
+                    word_with_max_score2 = word_with_max_score1
+                    word_with_max_score1 = w
+
+                print(f'DEBUG: w, max_score1, max_score2 = {w}, {max_score1}, {max_score2}')
+
+            # play the word
+            print(f'DEBUG: accepted_words = {accepted_words}')
+            best_word = word_with_max_score1
+            second_best_word = word_with_max_score2
+        else:
+            # dict is empty, i.e. could not find a valid word
+            # play pass
+            print('Could not find the word.')
+            return None
+
+        return [best_word, second_best_word]
+
+    
+        print('Παρακαλώ περίμενε λίγο.')
+        accepted_words = {}
+        for i in range(2, 8):
+            for perm in itertools.permutations(self.letters, i):
+                word = ''
+                for let in perm:
+                    # print('DEBUG: let = ', let)
+                    word = word + let
+                #print('DEBUG: find_best_word: word = ', word)
+
+                if word_in_file(word, FILE_GREEK):
+                    print('DEBUG: Accepted ', word)
+                    word_score = compute_word_score(word)
+
+                    # αποθήκευσε τη λέξη με το σκορ της στο λεξικό
+                    accepted_words.update({word: word_score})
+
+           
+        if len(accepted_words) != 0: 
+            # dict is not empty
+            # find the word with the maximum score
+            max_score = 0
+            for w in accepted_words.keys():
+                temp_score = compute_word_score(w)
+                
+                if temp_score > max_score and w != self.find_best_word():
+                    max_score = temp_score
+                    word_with_max_score = w
+
+                print(f'DEBUG: w, max_score = {w}, {max_score}')
+
+            # play the word
+            print(f'DEBUG: accepted_words = {accepted_words}')
+            second_best_word = word_with_max_score
+        else:
+            # dict is empty, i.e. could not find a valid word
+            # play pass
+            print('Could not find the word.')
+            return None
+
+        return second_best_word
 
 
 
@@ -634,6 +890,7 @@ def word_from_avail_letters(word, available_letters: list):
 
 def word_in_file(word, file):
     '''Checks whether the word is in the given file.'''
+
     with open(file, 'r', encoding='utf8') as f:
         accepted_words = f.readlines()
         if word + '\n' in accepted_words:
@@ -658,6 +915,7 @@ def create_available_letters_string(letters_of_player: String, letters_weight: d
 
 def compute_word_score(word):
     '''Computes the score of the word.'''
+
     score = 0
     for let in word:
         score += SakClass.letters_weight[let]
